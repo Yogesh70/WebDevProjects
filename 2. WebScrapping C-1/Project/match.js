@@ -28,7 +28,6 @@ function parseData(html) {
 
     for (let i = 0; i < bothInningsCard.length; i++) {
         let teamName = ch(bothInningsCard[i]).find('h5').text();
-        // console.log(teamName);
         teamName = teamName.split("INNINGS")[0].trim();
         // console.log(teamName);
 
@@ -45,11 +44,82 @@ function parseData(html) {
                 let sixes = ch(allTds[6]).text().trim();
                 let strikeRate = ch(allTds[7]).text().trim();
 
-                console.log(`Batsman => ${batsmanName} Runs => ${runs} Balls => ${balls} Fours => ${fours} Sixes => ${sixes} SR => ${strikeRate}`);
+                processDetails(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
             }
         }
         console.log('------------------------------');
     }
+}
+
+function processDetails(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
+    // check if team folder exists?
+    let isTeamFolder = checkTeamFolder(teamName);
+
+    if (isTeamFolder) {
+        let isBatsman = checkBatsmanFile(teamName, batsmanName);
+
+        if (isBatsman) {
+            updateBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+        }
+        else {
+            createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+        }
+    }
+    else {
+        createTeamFolder(teamName);
+        createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+    }
+}
+
+function createTeamFolder(teamName) {
+    // teamName -> MI
+    fs.mkdirSync(teamName);
+}
+
+function checkTeamFolder(teamName) {
+    // check folder exists or not
+    return fs.existsSync(teamName);
+}
+
+function createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
+    let batsmanPath = `${teamName}/${batsmanName}.json`;
+    let batsmanFile = [];
+    let innings = {
+        Runs: runs,
+        Balls: balls,
+        Fours: fours,
+        Sixes: sixes,
+        SR: strikeRate
+    }
+    batsmanFile.push(innings);
+    batsmanFile = JSON.stringify(batsmanFile);
+    fs.writeFileSync(batsmanPath, batsmanFile);
+}
+
+function checkBatsmanFile(teamName, batsmanName) {
+    // teamName -> MI
+    // batsman -> RohitSharma
+    // BatsmanPath -> `MI/RohitSharma.json` // javascript object notation
+    let batsmanPath = `${teamName}/${batsmanName}.json`;
+    return fs.existsSync(batsmanPath);
+}
+
+function updateBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
+    let batsmanPath = `${teamName}/${batsmanName}.json`;
+    let batsmanFile = fs.readFileSync(batsmanPath);
+    // stringified -> original form
+    batsmanFile = JSON.parse(batsmanFile);
+
+    let innings = {
+        Runs: runs,
+        Balls: balls,
+        Fours: fours,
+        Sixes: sixes,
+        SR: strikeRate
+    }
+    batsmanFile.push(innings);
+    batsmanFile = JSON.stringify(batsmanFile);
+    fs.writeFileSync(batsmanPath, batsmanFile);
 }
 
 module.exports = {
