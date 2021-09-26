@@ -23,7 +23,7 @@ function resultLink(html) {
     let resultContainer = ch('.widget-tabs.team-scores-tabs.card a');
     let resultBtn = ch(resultContainer[1]).attr('href');
     let completeResultLink = 'https://www.espncricinfo.com' + resultBtn;
-    console.log(completeResultLink);
+    // console.log(completeResultLink);
 
     request(completeResultLink, cb2);
 }
@@ -49,7 +49,8 @@ function parseData(html) {
 
     // getAllMatches(completeResultLink); // get link of all matches
     let allATags = ch('a[data-hover="Scorecard"]');
-    // [ <a></a>, <a></a>, <a></a>, ... ]
+    console.log(allATags)
+    // { <a></a>, <a></a>, <a></a>, ... } -> Object
 
     for (let i = 0; i < allATags.length; i++) {
         let link = ch(allATags[i]).attr('href');
