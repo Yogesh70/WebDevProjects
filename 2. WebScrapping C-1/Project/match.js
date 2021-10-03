@@ -3,6 +3,8 @@ const cheerio = require('cheerio');
 const request = require('request');
 let fs = require('fs');
 
+let leaderBoard = [];
+
 // const link = 'https://www.espncricinfo.com/series/ipl-2021-1249214/sunrisers-hyderabad-vs-punjab-kings-37th-match-1254107/full-scorecard';
 
 function getMatch(link) {
@@ -44,83 +46,113 @@ function parseData(html) {
                 let sixes = ch(allTds[6]).text().trim();
                 let strikeRate = ch(allTds[7]).text().trim();
 
-                processDetails(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+                // processDetails(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+                createLeaderBoard(teamName, batsmanName, runs, balls, fours, sixes);
             }
         }
         console.log('------------------------------');
     }
 }
 
-function processDetails(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
-    // check if team folder exists?
-    let isTeamFolder = checkTeamFolder(teamName);
+function createLeaderBoard(teamName, batsmanName, runs, balls, fours, sixes) {
+    runs = Number(runs);
+    balls = Number(balls);
+    fours = Number(fours);
+    sixes = Number(sixes);
 
-    if (isTeamFolder) {
-        let isBatsman = checkBatsmanFile(teamName, batsmanName);
-
-        if (isBatsman) {
-            updateBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
-        }
-        else {
-            createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+    // if entry exists update
+    for (let i = 0; i < leaderBoard.length; i++) {
+        if (leaderBoard[i].Batsman == batsmanName && leaderBoard[i].teamName == teamName) {
+            leaderBoard[i].Runs += runs;
+            leaderBoard[i].Balls += balls;
+            leaderBoard[i].Fours += fours;
+            leaderBoard[i].Sixes += sixes;
+            return;
         }
     }
-    else {
-        createTeamFolder(teamName);
-        createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
-    }
-}
 
-function createTeamFolder(teamName) {
-    // teamName -> MI
-    fs.mkdirSync(teamName);
-}
-
-function checkTeamFolder(teamName) {
-    // check folder exists or not
-    return fs.existsSync(teamName);
-}
-
-function createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
-    let batsmanPath = `${teamName}/${batsmanName}.json`;
-    let batsmanFile = [];
-    let innings = {
+    // entry doesn't exist
+    let entry = {
+        Team: teamName,
+        Batsman: batsmanName,
         Runs: runs,
         Balls: balls,
         Fours: fours,
-        Sixes: sixes,
-        SR: strikeRate
+        Sixes: sixes
     }
-    batsmanFile.push(innings);
-    batsmanFile = JSON.stringify(batsmanFile);
-    fs.writeFileSync(batsmanPath, batsmanFile);
+    leaderBoard.push(entry);
 }
 
-function checkBatsmanFile(teamName, batsmanName) {
-    // teamName -> MI
-    // batsman -> RohitSharma
-    // BatsmanPath -> `MI/RohitSharma.json` // javascript object notation
-    let batsmanPath = `${teamName}/${batsmanName}.json`;
-    return fs.existsSync(batsmanPath);
-}
+// function processDetails(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
+//     // check if team folder exists?
+//     let isTeamFolder = checkTeamFolder(teamName);
 
-function updateBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
-    let batsmanPath = `${teamName}/${batsmanName}.json`;
-    let batsmanFile = fs.readFileSync(batsmanPath);
-    // stringified -> original form
-    batsmanFile = JSON.parse(batsmanFile);
+//     if (isTeamFolder) {
+//         let isBatsman = checkBatsmanFile(teamName, batsmanName);
 
-    let innings = {
-        Runs: runs,
-        Balls: balls,
-        Fours: fours,
-        Sixes: sixes,
-        SR: strikeRate
-    }
-    batsmanFile.push(innings);
-    batsmanFile = JSON.stringify(batsmanFile);
-    fs.writeFileSync(batsmanPath, batsmanFile);
-}
+//         if (isBatsman) {
+//             updateBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+//         }
+//         else {
+//             createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+//         }
+//     }
+//     else {
+//         createTeamFolder(teamName);
+//         createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate);
+//     }
+// }
+
+// function createTeamFolder(teamName) {
+//     // teamName -> MI
+//     fs.mkdirSync(teamName);
+// }
+
+// function checkTeamFolder(teamName) {
+//     // check folder exists or not
+//     return fs.existsSync(teamName);
+// }
+
+// function createBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
+//     let batsmanPath = `${teamName}/${batsmanName}.json`;
+//     let batsmanFile = [];
+//     let innings = {
+//         Runs: runs,
+//         Balls: balls,
+//         Fours: fours,
+//         Sixes: sixes,
+//         SR: strikeRate
+//     }
+//     batsmanFile.push(innings);
+//     batsmanFile = JSON.stringify(batsmanFile);
+//     fs.writeFileSync(batsmanPath, batsmanFile);
+// }
+
+// function checkBatsmanFile(teamName, batsmanName) {
+//     // teamName -> MI
+//     // batsman -> RohitSharma
+//     // BatsmanPath -> `MI/RohitSharma.json` // javascript object notation
+//     let batsmanPath = `${teamName}/${batsmanName}.json`;
+//     return fs.existsSync(batsmanPath);
+// }
+
+// function updateBatsmanFile(teamName, batsmanName, runs, balls, fours, sixes, strikeRate) {
+//     let batsmanPath = `${teamName}/${batsmanName}.json`;
+//     let batsmanFile = fs.readFileSync(batsmanPath);
+//     // stringified -> original form
+//     batsmanFile = JSON.parse(batsmanFile);
+
+//     let innings = {
+//         Runs: runs,
+//         Balls: balls,
+//         Fours: fours,
+//         Sixes: sixes,
+//         SR: strikeRate
+//     }
+//     batsmanFile.push(innings);
+//     batsmanFile = JSON.stringify(batsmanFile);
+//     fs.writeFileSync(batsmanPath, batsmanFile);
+// }
 
 module.exports = {
     getMatch
