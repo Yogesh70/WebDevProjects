@@ -16,6 +16,7 @@ fs.readFile('./f1.txt', function cb(error, data) {
     })
 })
 
+// Layers
 // Callbacks -> Promises -> Async Await
 
 console.log('After');
