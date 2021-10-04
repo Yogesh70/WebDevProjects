@@ -4,16 +4,25 @@ const request = require('request');
 let fs = require('fs');
 
 let leaderBoard = [];
+let count = 0;
 
 // const link = 'https://www.espncricinfo.com/series/ipl-2021-1249214/sunrisers-hyderabad-vs-punjab-kings-37th-match-1254107/full-scorecard';
 
 function getMatch(link) {
+    console.log("Sending Request ", count);
     request(link, cb);
+    count++;
 }
 
 function cb(error, response, html) {
     if (error == null && response.statusCode == 200) {
+        count--;
+        console.log('Received Data ', count);
         parseData(html);
+
+        if (count == 0) {
+            console.table(leaderBoard);
+        }
     }
     else if (response.statusCode == 404) {
         console.log('Page not found');
@@ -50,7 +59,7 @@ function parseData(html) {
                 createLeaderBoard(teamName, batsmanName, runs, balls, fours, sixes);
             }
         }
-        console.log('------------------------------');
+        // console.log('------------------------------');
     }
 }
 
@@ -60,9 +69,9 @@ function createLeaderBoard(teamName, batsmanName, runs, balls, fours, sixes) {
     fours = Number(fours);
     sixes = Number(sixes);
 
-    // if entry exists update
+    // if entry exists- update
     for (let i = 0; i < leaderBoard.length; i++) {
-        if (leaderBoard[i].Batsman == batsmanName && leaderBoard[i].teamName == teamName) {
+        if (leaderBoard[i].Batsman == batsmanName && leaderBoard[i].Team == teamName) {
             leaderBoard[i].Runs += runs;
             leaderBoard[i].Balls += balls;
             leaderBoard[i].Fours += fours;
