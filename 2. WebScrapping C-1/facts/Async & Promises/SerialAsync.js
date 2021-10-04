@@ -3,6 +3,7 @@ let fs = require('fs');
 
 console.log('Before');
 
+// callback Hell
 fs.readFile('./f1.txt', function cb(error, data) {
     console.log('Content ' + data);
 
@@ -15,5 +16,6 @@ fs.readFile('./f1.txt', function cb(error, data) {
     })
 })
 
+// Callbacks -> Promises -> Async Await
 
 console.log('After');
