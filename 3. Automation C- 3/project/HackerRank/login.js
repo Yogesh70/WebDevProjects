@@ -1,5 +1,6 @@
 // Automation Code
 // Fn() of puppeteer returns the <pending> promises
+const { futimesSync } = require('fs');
 const puppeteer = require('puppeteer');
 
 let tab;
@@ -66,11 +67,19 @@ browserOpenPromise.then(function (browser) {
             completeLinks.push(completeLink);
         }
         // console.log(completeLinks);
-        let questionSolvedPromise = solveQuestion(completeLinks[0]); // serially => loops
-        return questionSolvedPromise;
+        // let questionSolvedPromise = solveQuestion(completeLinks[0]); // serially => loops
+        // return questionSolvedPromise;
+
+        let oneQuesSolvedPromise = solveQuestion(completeLinks[0]); // serially loop
+        for (let i = 1; i < completeLinks.length; i++) {
+            oneQuesSolvedPromise = oneQuesSolvedPromise.then(function () {
+                let nextQuesSolvedPromise = solveQuestion(completeLinks[i]);
+                return nextQuesSolvedPromise;
+            })
+        }
     })
     .then(function () {
-        console.log('Q1 solved');
+        console.log("All Q's solved");
     })
     .catch(function (error) {
         console.log(error);
@@ -138,6 +147,21 @@ function getCode() {
     })
 }
 
+function handleLockBtn() {
+    return new Promise(function (resolve, reject) {
+        let waitAndClickPromise = waitAndClick('.ui-btn.ui-btn-normal.ui-btn-primary.ui-btn-styled');
+        waitAndClickPromise.then(function () {
+            console.log('Lock Btn Clicked!');
+            resolve();
+        })
+            .catch(function (error) {
+                // when waitAndClick() fails -> when selector is not found !!
+                console.log('Lock Btn not Found..');
+                resolve();
+            })
+    })
+}
+
 function solveQuestion(qLink) {
     return new Promise(function (resolve, reject) {
         let questionGotoPromise = tab.goto(qLink);
@@ -145,8 +169,12 @@ function solveQuestion(qLink) {
             console.log('opened question!!');
         })
             .then(function () {
-                let waitPromise = waitAndClick('a[href="/challenges/one-month-preparation-kit-plus-minus/editorial"]');
+                let waitPromise = waitAndClick('a [data-attr2="Editorial"]');
                 return waitPromise;
+            })
+            .then(function () {
+                let handleLockBtnPromise = handleLockBtn();
+                return handleLockBtnPromise;
             })
             .then(function () {
                 let codePromise = getCode();
@@ -154,7 +182,7 @@ function solveQuestion(qLink) {
             })
             .then(function () {
                 // console.log('got code !');
-                let clickedPromise = tab.click('a[href="/challenges/one-month-preparation-kit-plus-minus/problem"]');
+                let clickedPromise = tab.click('a [data-attr2="Problem"]');
                 return clickedPromise;
             })
             .then(function () {
@@ -165,6 +193,12 @@ function solveQuestion(qLink) {
                 // console.log('Code Pasted');
                 let submitBtnClickedPromise = tab.click('.ui-btn.ui-btn-normal.ui-btn-primary.pull-right.hr-monaco-submit.ui-btn-styled');
                 return submitBtnClickedPromise;
+            })
+            .then(function () {
+                resolve();
+            })
+            .catch(function (error) {
+                reject(error);
             })
     })
 }
