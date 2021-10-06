@@ -3,6 +3,8 @@
 const puppeteer = require('puppeteer');
 
 let tab;
+let idx;
+let gCode;
 
 // build a browser / open a browser
 let browserOpenPromise = puppeteer.launch({
@@ -35,13 +37,8 @@ browserOpenPromise.then(function (browser) {
         return loginBtnClicked;
     })
     .then(function () {
-        // On change of webPage, Data comes up very fast but DOM is not loaded till yet. So, Time is reqd for loading of DOM. To overCome this problem we use waitPromise so that DOM is loaded completely.  
-        let waitPromise = tab.waitForSelector('a[data-attr1="one-month-preparation-kit"]', { visible: true })
-        return waitPromise;
-    })
-    .then(function () {
-        let PrepkitBtnPromise = tab.click('a[data-attr1="one-month-preparation-kit"]');
-        return PrepkitBtnPromise;
+        let waitAndClickPromise = waitAndClick('a[data-attr1="one-month-preparation-kit"]');
+        return waitAndClickPromise;
     })
     .then(function () {
         let waitPromise = tab.waitForSelector('.ui-btn.ui-btn-normal.ui-btn-line-primary.interview-ch-li-cta.ui-btn-link.ui-btn-styled');
@@ -63,8 +60,159 @@ browserOpenPromise.then(function (browser) {
         return allQuestionsPromise;
     })
     .then(function (allLinks) {
-        console.log(allLinks);
+        let completeLinks = [];
+        for (let i = 0; i < allLinks.length; i++) {
+            completeLink = 'http://www.hackerrank.com' + allLinks[i];
+            completeLinks.push(completeLink);
+        }
+        // console.log(completeLinks);
+        let questionSolvedPromise = solveQuestion(completeLinks[0]); // serially => loops
+        return questionSolvedPromise;
+    })
+    .then(function () {
+        console.log('Q1 solved');
     })
     .catch(function (error) {
         console.log(error);
     })
+
+function waitAndClick(selector) {
+    return new Promise(function (resolve, reject) {
+        // On change of webPage, Data comes up very fast but DOM is not loaded till yet. So, Time is reqd for loading of DOM. To overCome this problem we use waitPromise so that DOM is loaded completely.  
+        let waitPromise = tab.waitForSelector(selector, { visible: true })
+        waitPromise.then(function () {
+            let clickedPromise = tab.click(selector);
+            return clickedPromise;
+        })
+            .then(function () {
+                resolve();
+            })
+            .catch(function (error) {
+                reject(error);
+            })
+    })
+}
+
+function getCode() {
+    return new Promise(function (resolve, reject) {
+        let waitPromise = tab.waitForSelector('.hackdown-content h3');
+        waitPromise.then(function () {
+            let allCodeNamesPromise = tab.$$('.hackdown-content h3');
+            return allCodeNamesPromise;
+        })
+            .then(function (allCodesNames) {
+                // [ <h3>C++</h3>, <h3>Python</h3>, <h3>Ruby</h3]
+                let allCodesNamesPromise = [];
+                // [Promise<pending>, Promise<pending>, Promise<pending>]
+                for (let i = 0; i < allCodesNames.length; i++) {
+                    let namePromise = tab.evaluate(function (elem) { return elem.textContent; }, allCodesNames[i]);
+                    allCodesNamesPromise.push(namePromise);
+                }
+                let promiseAllCodesNames = Promise.all(allCodesNamesPromise);
+                return promiseAllCodesNames;
+            })
+            .then(function (allCodesNames) {
+                for (let i = 0; i < allCodesNames.length; i++) {
+                    if (allCodesNames[i] == 'C++') {
+                        idx = i;
+                        break;
+                    }
+                }
+
+                let allCodesDivPromise = tab.$$('.hackdown-content .highlight');
+                return allCodesDivPromise;
+            })
+            .then(function (allCodesDiv) {
+                // [<div> </div>, <div> </div>, <div> </div>]
+                let codeDiv = allCodesDiv[idx];
+                let codePromise = tab.evaluate(function (elem) { return elem.textContent }, codeDiv);
+                return codePromise;
+            })
+            .then(function (code) {
+                gCode = code;
+                resolve();
+            })
+            .catch(function (error) {
+                reject(error);
+            })
+    })
+}
+
+function solveQuestion(qLink) {
+    return new Promise(function (resolve, reject) {
+        let questionGotoPromise = tab.goto(qLink);
+        questionGotoPromise.then(function () {
+            console.log('opened question!!');
+        })
+            .then(function () {
+                let waitPromise = waitAndClick('a[href="/challenges/one-month-preparation-kit-plus-minus/editorial"]');
+                return waitPromise;
+            })
+            .then(function () {
+                let codePromise = getCode();
+                return codePromise;
+            })
+            .then(function () {
+                // console.log('got code !');
+                let clickedPromise = tab.click('a[href="/challenges/one-month-preparation-kit-plus-minus/problem"]');
+                return clickedPromise;
+            })
+            .then(function () {
+                let codePastedPromise = pasteCode();
+                return codePastedPromise;
+            })
+            .then(function () {
+                // console.log('Code Pasted');
+                let submitBtnClickedPromise = tab.click('.ui-btn.ui-btn-normal.ui-btn-primary.pull-right.hr-monaco-submit.ui-btn-styled');
+                return submitBtnClickedPromise;
+            })
+    })
+}
+
+function pasteCode() {
+    return new Promise(function (resolve, reject) {
+        let waitAndClickPromise = waitAndClick('.checkbox-wrap');
+        waitAndClickPromise.then(function () {
+            let codeTypedPromise = tab.type('.custominput', gCode);
+            return codeTypedPromise;
+        })
+            .then(function () {
+                // console.log('Code is typed !');
+                let controlKeyHoldPromise = tab.keyboard.down('Control');
+                return controlKeyHoldPromise;
+            })
+            .then(function () {
+                let aKeyHoldPromise = tab.keyboard.down('a');
+                return aKeyHoldPromise;
+            })
+            .then(function () {
+                let xKeyHoldPromise = tab.keyboard.down('x');
+                return xKeyHoldPromise;
+            })
+            .then(function () {
+                console.log('editor selected');
+                let editorSelectedPromise = tab.click('.overflow-guard');
+                return editorSelectedPromise;
+            })
+            .then(function () {
+                console.log('ctrl key pressed');
+                let controlKeyHoldPromise = tab.keyboard.down('Control');
+                return controlKeyHoldPromise;
+            })
+            .then(function () {
+                let aKeyHoldPromise = tab.keyboard.down('a');
+                return aKeyHoldPromise;
+            })
+            .then(function () {
+                let vKeyHoldPromise = tab.keyboard.down('v');
+                return vKeyHoldPromise;
+            })
+            .then(function () {
+                resolve();
+            })
+
+            .catch(function (error) {
+                reject(error);
+            })
+    })
+}
