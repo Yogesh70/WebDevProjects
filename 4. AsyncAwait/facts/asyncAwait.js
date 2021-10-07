@@ -30,8 +30,11 @@ console.log('end');
 // IIFE -> self invoke/call
 (async function () {
     try {
-        let f1Data = await fs.promises.readFile('./f1.txt', 'utf-8');
-        console.log(f1Data);
+        let f1Promise = fs.promises.readFile('./f1.txt', 'utf-8');
+        let f2Promise = fs.promises.readFile('./f2.txt', 'utf-8');
+        
+        let bothFileData = await Promise.all([f1Promise, f2Promise]); // serially
+        console.log(bothFileData);
     }
     catch (error) {
         console.log(error);
