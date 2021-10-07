@@ -1,6 +1,5 @@
 // Automation Code
 // Fn() of puppeteer returns the <pending> promises
-const { futimesSync } = require('fs');
 const puppeteer = require('puppeteer');
 
 let tab;
