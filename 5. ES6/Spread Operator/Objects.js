@@ -47,15 +47,22 @@ let doubleCopy = {
 // console.log(doubleCopy);
 
 
-let deepCopy = {
-    ...state,
-    address: {
-        ...state.address,
-        country: {
-            ...state.address.country
-        }
-    }
-}
-deepCopy.address.country.countryName = "India";
+// let deepCopy = {
+//     ...state,
+//     address: {
+//         ...state.address,
+//         country: {
+//             ...state.address.country
+//         }
+//     }
+// }
+// deepCopy.address.country.countryName = "India";
+// console.log(state);
+// console.log(deepCopy);
+
+// another way -- if there are multiple nested objects
+let dCopy = JSON.parse(JSON.stringify(state));
+// console.log(dCopy);
+dCopy.address.country.countryName = "India";
 console.log(state);
-console.log(deepCopy);
+console.log(dCopy);
