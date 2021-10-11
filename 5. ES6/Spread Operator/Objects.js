@@ -1,5 +1,3 @@
-const { stat } = require("fs");
-
 let state = {
     name: 'John',
     address: {

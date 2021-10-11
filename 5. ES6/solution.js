@@ -10,7 +10,7 @@
 // filteredList = watchList.map(function(item) {
 //     return {title: item["Title"], rating: item["imdbRating"]}
 //   })
-  
+
 //   filteredList = filteredList.filter(function(item) {
 //     return Number(item.rating) >= 8.0
 //   })
@@ -25,3 +25,8 @@
 // arr = arr.map(function(elem) {
 //   return elem * elem
 // })
+
+// Q4. ->  https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/es6/use-destructuring-assignment-to-assign-variables-from-nested-objects
+
+// let { today: { low: lowToday, high: highToday } } = LOCAL_FORECAST;
+
