@@ -7,8 +7,7 @@
     <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
     <!-- track changes in dom -->
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-    <!--make changes from
-        virtual dom to actual dom-->
+    <!--make changes from virtual dom to actual dom-->
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -20,18 +19,36 @@
 </body>
 
 <script type="text/babel">
+
+    // when arr & func() is passed inside return() -> everything is fine
+    let arr = ['Harry', 'Ron'];
+    function fn() {
+        return 'asics';
+    }
+
     // functional components
     function Hello() {
         return (
             // JSX Code
             <React.Fragment>
-                <h1>Hello</h1>
-                <h2>Hello2</h2>
+                <h1>Hello {arr}</h1>
+                <h2>Hello2 {fn()}</h2>
             </React.Fragment>
         );
     }
 
-    ReactDOM.render(<Hello />, document.getElementById('root'));
+    function Hellos() {
+        return (
+            <React.Fragment>
+                <Hello />
+                <Hello />
+                <Hello />
+                <Hello />
+            </React.Fragment>
+        )
+    }
+
+    ReactDOM.render(<Hellos />, document.getElementById('root'));
 </script>
 
 </html>
