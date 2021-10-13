@@ -20,19 +20,15 @@
 
 <script type="text/babel">
 
-    // when arr & func() is passed inside return() -> everything is fine
-    let arr = ['Harry', 'Ron'];
-    function fn() {
-        return 'asics';
-    }
+
 
     // functional components
-    function Hello() {
+    function Hello(props) {
         return (
             // JSX Code
             <React.Fragment>
-                <h1>Hello {arr}</h1>
-                <h2>Hello2 {fn()}</h2>
+                <h1>Hello {props.person}</h1>
+                <h2>Hello2 {}</h2>
             </React.Fragment>
         );
     }
@@ -40,8 +36,8 @@
     function Hellos() {
         return (
             <React.Fragment>
-                <Hello />
-                <Hello />
+                <Hello person="Alex" />
+                <Hello person="Henry" />
                 <Hello />
                 <Hello />
             </React.Fragment>
