@@ -23,12 +23,12 @@
 
 
     // functional components
-    function Hello(props) {
+    function Hello({ person = "default" }) {
         return (
             // JSX Code
             <React.Fragment>
-                <h1>Hello {props.person}</h1>
-                <h2>Hello2 {}</h2>
+                <h1>Hello {person}</h1>
+                <h2>Hello2 {person}</h2>
             </React.Fragment>
         );
     }
