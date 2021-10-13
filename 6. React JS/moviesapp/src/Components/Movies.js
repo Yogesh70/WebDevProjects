@@ -7,13 +7,14 @@ class Movies extends React.Component {
         super();
 
         this.state = {
-            movies: getMovies()
+            movies: getMovies(),
+            currSearchTxt: ''
         }
     }
 
     handleDelete = (id) => {
         let moviesArrCopy = this.state.movies.filter((moviesObj) => {
-            return moviesObj._id != id
+            return moviesObj._id !== id
         })
 
         this.setState({
@@ -21,7 +22,30 @@ class Movies extends React.Component {
         })
     }
 
+    handleChange = (e) => {
+        let val = e.target.value;
+        console.log(val);
+        this.setState({
+            currSearchTxt: val
+        })
+    }
+
     render() {
+        // console.log('render');
+        let { movies, currSearchTxt } = this.state; // ES6 Destructuring
+        let filteredArr = [];
+
+        if (currSearchTxt === '') {
+            filteredArr = movies;
+        }
+        else {
+            filteredArr = movies.filter(function (movieObj) {
+                let title = movieObj.title.toLowerCase();
+                console.log(title);
+                return title.includes(currSearchTxt.toLowerCase());
+            })
+        }
+
         return (
             // JSX
             <React.Fragment>
@@ -31,7 +55,7 @@ class Movies extends React.Component {
                             Hello
                         </div>
                         <div className='col-9'>
-
+                            <input value={this.state.currSearchTxt} onChange={this.handleChange} type="search"></input>
                             <table className="table">
                                 <thead>
                                     <tr>
@@ -45,7 +69,7 @@ class Movies extends React.Component {
                                 </thead>
                                 <tbody>
                                     {
-                                        this.state.movies.map((movieObj) => {
+                                        filteredArr.map((movieObj) => {
                                             return (
                                                 <tr scope="row" key={movieObj._id}>
                                                     <td></td>
@@ -53,7 +77,7 @@ class Movies extends React.Component {
                                                     <td>{movieObj.genre.name}</td>
                                                     <td>{movieObj.numberInStock}</td>
                                                     <td>{movieObj.dailyRentalRate}</td>
-                                                    <td><button onClick={() => this.handleDelete(movieObj._id)} type="button" className="btn btn-danger">Delete</button></td>
+                                                    <td><button onClick={function () { this.handleDelete(movieObj._id) }.bind(this)} type="button" className="btn btn-danger">Delete</button></td>
                                                 </tr>
                                             );
                                         })
