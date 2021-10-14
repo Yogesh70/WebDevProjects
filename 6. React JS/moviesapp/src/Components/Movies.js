@@ -30,6 +30,50 @@ class Movies extends React.Component {
         })
     }
 
+    sortByRatings = (e) => {
+        let className = e.target.className;
+
+        let sortedMovieArr = [];
+        if (className === 'fas fa-sort-up') {
+            // ascending order
+            sortedMovieArr = this.state.movies.sort(function (movieObjA, movieObjB) {
+                return movieObjA.dailyRentalRate - movieObjB.dailyRentalRate;
+            })
+        }
+        else {
+            // descending order
+            sortedMovieArr = this.state.movies.sort(function (movieObjA, movieObjB) {
+                return movieObjB.dailyRentalRate - movieObjA.dailyRentalRate;
+            })
+        }
+
+        this.setState({
+            movies: sortedMovieArr
+        })
+    }
+
+    sortByStock = (e) => {
+        let className = e.target.className;
+
+        let sortedMovieArr = [];
+        if (className === 'fas fa-sort-up') {
+            // ascending order  
+            sortedMovieArr = this.state.movies.sort(function (movieObjA, movieObjB) {
+                return movieObjA.numberInStock - movieObjB.numberInStock;
+            })
+        }
+        else {
+            // descending order
+            sortedMovieArr = this.state.movies.sort(function (movieObjA, movieObjB) {
+                return movieObjB.numberInStock - movieObjA.numberInStock;
+            })
+        }
+
+        this.setState({
+            movies: sortedMovieArr
+        })
+    }
+
     render() {
         // console.log('render');
         let { movies, currSearchTxt } = this.state; // ES6 Destructuring
@@ -63,14 +107,14 @@ class Movies extends React.Component {
                                         <th scope="col">Title</th>
                                         <th scope="col">Genre</th>
                                         <th scope="col">
-                                            <i style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
+                                            <i onClick={this.sortByStock} style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
                                             Stock
-                                            <i style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
+                                            <i onClick={this.sortByStock} style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
                                         </th>
                                         <th scope="col">
-                                            <i style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
+                                            <i onClick={this.sortByRatings} style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
                                             Rating
-                                            <i style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
+                                            <i onClick={this.sortByRatings} style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
                                         </th>
                                         <th></th>
                                     </tr>
