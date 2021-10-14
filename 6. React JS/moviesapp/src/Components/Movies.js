@@ -10,7 +10,7 @@ class Movies extends React.Component {
             movies: getMovies(),
             currSearchTxt: '',
             currPage: 1,
-            limit: 5
+            limit: 4
         }
     }
 
@@ -76,6 +76,12 @@ class Movies extends React.Component {
         })
     }
 
+    handlePageChange = (pageNumber) => {
+        this.setState({
+            currPage: pageNumber
+        })
+    }
+
     render() {
         // console.log('render');
         let { movies, currSearchTxt, currPage, limit } = this.state; // ES6 Destructuring
@@ -93,10 +99,22 @@ class Movies extends React.Component {
         }
 
         // Pagination
+        let noOfPage = Math.ceil(filteredArr.length / limit);
+        let pageNumberArr = [];
+        for (let i = 0; i < noOfPage; i++) {
+            pageNumberArr.push(i + 1);
+        }
+
+
         let si = (currPage - 1) * limit;
         let ei = si + limit - 1;
-
         filteredArr = filteredArr.slice(si, ei + 1);
+
+        if (filteredArr.length === 0) {
+            this.setState({
+                currPage: 1
+            })
+        }
 
         return (
             // JSX
@@ -146,20 +164,29 @@ class Movies extends React.Component {
                             </table>
                             <nav aria-label="...">
                                 <ul className="pagination">
-                                    <li className="page-item"><a className="page-link" href="#">1</a></li>
-                                    <li className="page-item active" aria-current="page">
-                                        <a className="page-link" href="#">2</a>
-                                    </li>
-                                    <li className="page-item"><a className="page-link" href="#">3</a></li>
+                                    {
+                                        pageNumberArr.map((pageNumber) => {
+                                            let classStyleName = pageNumber === currPage ? "page-item active" : "page-item";
+                                            return (
+                                                <li onClick={() => this.handlePageChange(pageNumber)} key={pageNumber} className={classStyleName} style={{ cursor: 'pointer' }}><span className='page-link'>{pageNumber}</span>
+                                                </li>
+                                            )
+                                        })
+                                    }
                                 </ul>
                             </nav>
                         </div>
                     </div>
-
                 </div>
             </React.Fragment>
         );
     }
 }
+
+// <li className="page-item"><a className="page-link" href="#">1</a></li>
+// <li className="page-item active" aria-current="page">
+//     <a className="page-link" href="#">2</a>
+// </li>
+// <li className="page-item"><a className="page-link" href="#">3</a></li>
 
 export default Movies;
