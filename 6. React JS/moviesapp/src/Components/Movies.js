@@ -1,5 +1,5 @@
 import React from 'react';
-import { getMovies } from './getMovies';
+import axios from 'axios'
 
 class Movies extends React.Component {
 
@@ -7,11 +7,20 @@ class Movies extends React.Component {
         super();
 
         this.state = {
-            movies: getMovies(),
+            movies: [],
             currSearchTxt: '',
             currPage: 1,
             limit: 4
         }
+    }
+
+    async componentDidMount() {
+        console.log("Component did mount");
+        let res = await axios.get('https://backend-react-movie.herokuapp.com/movies');
+        // console.log(res.data.movies);
+        this.setState({
+            movies: res.data.movies
+        })
     }
 
     handleDelete = (id) => {
@@ -82,8 +91,15 @@ class Movies extends React.Component {
         })
     }
 
+    handleLimit = (e) => {
+        let val = e.target.value;
+        this.setState({
+            limit: val
+        })
+    }
+
     render() {
-        // console.log('render');
+        console.log('render');
         let { movies, currSearchTxt, currPage, limit } = this.state; // ES6 Destructuring
         let filteredArr = [];
 
@@ -110,11 +126,11 @@ class Movies extends React.Component {
         let ei = si + limit - 1;
         filteredArr = filteredArr.slice(si, ei + 1);
 
-        if (filteredArr.length === 0) {
-            this.setState({
-                currPage: 1
-            })
-        }
+        // if (filteredArr.length === 0) {
+        //     this.setState({
+        //         currPage: 1
+        //     })
+        // }
 
         return (
             // JSX
@@ -125,7 +141,8 @@ class Movies extends React.Component {
                             Hello
                         </div>
                         <div className='col-9'>
-                            <input value={this.state.currSearchTxt} onChange={this.handleChange} type="search"></input>
+                            <input value={this.state.currSearchTxt} onChange={this.handleChange} type="search" placeholder="Search"></input>
+                            <input value={this.state.limit > filteredArr.length ? filteredArr.length : this.state.limit} onChange={this.handleLimit} min='1' max={movies.length} type="number" style={{ marginLeft: '1.5rem' }}></input>
                             <table className="table">
                                 <thead>
                                     <tr>
