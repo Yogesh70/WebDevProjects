@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { getMovies } from './getMovies';
 
 class Movies extends React.Component {
@@ -41,7 +41,7 @@ class Movies extends React.Component {
         else {
             filteredArr = movies.filter(function (movieObj) {
                 let title = movieObj.title.toLowerCase();
-                console.log(title);
+                // console.log(title);
                 return title.includes(currSearchTxt.toLowerCase());
             })
         }
@@ -62,8 +62,16 @@ class Movies extends React.Component {
                                         <th scope="col">#</th>
                                         <th scope="col">Title</th>
                                         <th scope="col">Genre</th>
-                                        <th scope="col">Stock</th>
-                                        <th scope="col">Rating</th>
+                                        <th scope="col">
+                                            <i style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
+                                            Stock
+                                            <i style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
+                                        </th>
+                                        <th scope="col">
+                                            <i style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
+                                            Rating
+                                            <i style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
+                                        </th>
                                         <th></th>
                                     </tr>
                                 </thead>
