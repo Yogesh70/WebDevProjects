@@ -8,7 +8,9 @@ class Movies extends React.Component {
 
         this.state = {
             movies: getMovies(),
-            currSearchTxt: ''
+            currSearchTxt: '',
+            currPage: 1,
+            limit: 5
         }
     }
 
@@ -76,7 +78,7 @@ class Movies extends React.Component {
 
     render() {
         // console.log('render');
-        let { movies, currSearchTxt } = this.state; // ES6 Destructuring
+        let { movies, currSearchTxt, currPage, limit } = this.state; // ES6 Destructuring
         let filteredArr = [];
 
         if (currSearchTxt === '') {
@@ -89,6 +91,12 @@ class Movies extends React.Component {
                 return title.includes(currSearchTxt.toLowerCase());
             })
         }
+
+        // Pagination
+        let si = (currPage - 1) * limit;
+        let ei = si + limit - 1;
+
+        filteredArr = filteredArr.slice(si, ei + 1);
 
         return (
             // JSX
@@ -136,8 +144,18 @@ class Movies extends React.Component {
                                     }
                                 </tbody>
                             </table>
+                            <nav aria-label="...">
+                                <ul className="pagination">
+                                    <li className="page-item"><a className="page-link" href="#">1</a></li>
+                                    <li className="page-item active" aria-current="page">
+                                        <a className="page-link" href="#">2</a>
+                                    </li>
+                                    <li className="page-item"><a className="page-link" href="#">3</a></li>
+                                </ul>
+                            </nav>
                         </div>
                     </div>
+
                 </div>
             </React.Fragment>
         );
