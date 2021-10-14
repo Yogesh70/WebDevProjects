@@ -94,15 +94,16 @@ class Movies extends React.Component {
     handleLimit = (e) => {
         let val = e.target.value;
         this.setState({
-            limit: val
+            limit: Number(val)
         })
     }
 
     render() {
         console.log('render');
+        console.log(this.state);
         let { movies, currSearchTxt, currPage, limit } = this.state; // ES6 Destructuring
-        let filteredArr = [];
 
+        let filteredArr = [];
         if (currSearchTxt === '') {
             filteredArr = movies;
         }
@@ -126,12 +127,6 @@ class Movies extends React.Component {
         let ei = si + limit - 1;
         filteredArr = filteredArr.slice(si, ei + 1);
 
-        // if (filteredArr.length === 0) {
-        //     this.setState({
-        //         currPage: 1
-        //     })
-        // }
-
         return (
             // JSX
             <React.Fragment>
@@ -142,7 +137,7 @@ class Movies extends React.Component {
                         </div>
                         <div className='col-9'>
                             <input value={this.state.currSearchTxt} onChange={this.handleChange} type="search" placeholder="Search"></input>
-                            <input value={this.state.limit > filteredArr.length ? filteredArr.length : this.state.limit} onChange={this.handleLimit} min='1' max={movies.length} type="number" style={{ marginLeft: '1.5rem' }}></input>
+                            <input value={this.state.limit < filteredArr.length ? this.state.limit : filteredArr.length} onChange={this.handleLimit} min='1' max={movies.length} type="number" style={{ marginLeft: '1.5rem' }}></input>
                             <table className="table">
                                 <thead>
                                     <tr>
@@ -165,6 +160,8 @@ class Movies extends React.Component {
                                 <tbody>
                                     {
                                         filteredArr.map((movieObj) => {
+                                            console.log(filteredArr);
+
                                             return (
                                                 <tr scope="row" key={movieObj._id}>
                                                     <td></td>
