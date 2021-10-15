@@ -12,8 +12,12 @@ function App() {
         <Nav />
         <Switch>  {/* Checks the path with the route entered */}
           <Route path='/' exact component={Home} /> {/* exact -> Checks the exact path with the route entered */}
-          <Route path='/movies' exact component={Movies} />
-          <Route path='/about' exact component={About} />
+          <Route path='/movies' component={Movies} />
+          {/* <Route path='/about' component={About} /> */}
+          {/* Props Passing in routing */}
+          <Route path='/about' render={(props) => (
+            <About {...props} isAuth={true} />
+          )} />
         </Switch>
       </Router>
     </React.Fragment>
