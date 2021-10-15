@@ -10,16 +10,21 @@ class Movies extends React.Component {
             movies: [],
             currSearchTxt: '',
             currPage: 1,
-            limit: 4
+            limit: 4,
+            genres: [{ _id: 'abcd', name: 'All Genres' }],
+            cGenre: 'All Genres'
         }
     }
 
     async componentDidMount() {
         console.log("Component did mount");
         let res = await axios.get('https://backend-react-movie.herokuapp.com/movies');
+        let genreRes = await axios.get('https://backend-react-movie.herokuapp.com/genres');
         // console.log(res.data.movies);
+        console.log(genreRes.data.genres);
         this.setState({
-            movies: res.data.movies
+            movies: res.data.movies,
+            genres: [...this.state.genres, ...genreRes.data.genres]
         })
     }
 
@@ -98,10 +103,15 @@ class Movies extends React.Component {
         })
     }
 
+    handleGenreChange = (genre) => {
+        this.setState({
+            cGenre: genre
+        })
+    }
+
     render() {
         console.log('render');
-        console.log(this.state);
-        let { movies, currSearchTxt, currPage, limit } = this.state; // ES6 Destructuring
+        let { movies, currSearchTxt, currPage, limit, genres, cGenre } = this.state; // ES6 Destructuring
 
         let filteredArr = [];
         if (currSearchTxt === '') {
@@ -112,6 +122,13 @@ class Movies extends React.Component {
                 let title = movieObj.title.toLowerCase();
                 // console.log(title);
                 return title.includes(currSearchTxt.toLowerCase());
+            })
+        }
+
+        // Sort filteredArr on basis of Genres
+        if (cGenre !== 'All Genres') {
+            filteredArr = filteredArr.filter(function (movieObj) {
+                return movieObj.genre.name === cGenre;
             })
         }
 
@@ -129,70 +146,92 @@ class Movies extends React.Component {
 
         return (
             // JSX
-            <React.Fragment>
-                <div className='container'>
-                    <div className='row'>
-                        <div className='col-3'>
-                            Hello
-                        </div>
-                        <div className='col-9'>
-                            <input value={this.state.currSearchTxt} onChange={this.handleChange} type="search" placeholder="Search"></input>
-                            <input value={this.state.limit < filteredArr.length ? this.state.limit : filteredArr.length} onChange={this.handleLimit} min='1' max={movies.length} type="number" style={{ marginLeft: '1.5rem' }}></input>
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Title</th>
-                                        <th scope="col">Genre</th>
-                                        <th scope="col">
-                                            <i onClick={this.sortByStock} style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
-                                            Stock
-                                            <i onClick={this.sortByStock} style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
-                                        </th>
-                                        <th scope="col">
-                                            <i onClick={this.sortByRatings} style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
-                                            Rating
-                                            <i onClick={this.sortByRatings} style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
-                                        </th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        filteredArr.map((movieObj) => {
-                                            console.log(filteredArr);
-
-                                            return (
-                                                <tr scope="row" key={movieObj._id}>
-                                                    <td></td>
-                                                    <td>{movieObj.title}</td>
-                                                    <td>{movieObj.genre.name}</td>
-                                                    <td>{movieObj.numberInStock}</td>
-                                                    <td>{movieObj.dailyRentalRate}</td>
-                                                    <td><button onClick={function () { this.handleDelete(movieObj._id) }.bind(this)} type="button" className="btn btn-danger">Delete</button></td>
+            <>
+                {   // Loading animation
+                    this.state.movies.length === 0 ? <div class="text-center"><div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div></div> :
+                        < React.Fragment >
+                            <div className='container'>
+                                <div className='row'>
+                                    <div className='col-3'>
+                                        <ul style={{ marginTop: "1rem" }} className="list-group">
+                                            {/* <li className="list-group-item active" aria-current="true">All Genres</li>
+                                            <li className="list-group-item">Action</li>
+                                            <li className="list-group-item">Thriller</li>
+                                            <li className="list-group-item">Comedy</li>
+                                            <li className="list-group-item">Adventure</li> */}
+                                            {
+                                                genres.map((genreObj) => {
+                                                    let classStyleName = genreObj.name === cGenre ? 'list-group-item active' : 'list-group-item';
+                                                    return (
+                                                        <li key={genres._id} onClick={() => this.handleGenreChange(genreObj.name)} className={classStyleName} style={{ cursor: "pointer" }}>
+                                                            {genreObj.name}
+                                                        </li>
+                                                    );
+                                                })
+                                            }
+                                        </ul>
+                                        <h5 style={{ marginTop: "0.5rem" }}>Current Genre: {cGenre}</h5>
+                                    </div>
+                                    <div className='col-9'>
+                                        <input value={this.state.currSearchTxt} onChange={this.handleChange} type="search" placeholder="Search" style={{ marginTop: "1rem" }}></input>
+                                        <input value={this.state.limit < filteredArr.length ? this.state.limit : filteredArr.length} onChange={this.handleLimit} min='1' max={movies.length} type="number" style={{ marginLeft: '1.5rem' }}></input>
+                                        <table className="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Title</th>
+                                                    <th scope="col">Genre</th>
+                                                    <th scope="col">
+                                                        <i onClick={this.sortByStock} style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
+                                                        Stock
+                                                        <i onClick={this.sortByStock} style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <i onClick={this.sortByRatings} style={{ cursor: 'pointer' }} className="fas fa-sort-up"></i>
+                                                        Rating
+                                                        <i onClick={this.sortByRatings} style={{ cursor: 'pointer' }} className="fas fa-sort-down"></i>
+                                                    </th>
+                                                    <th></th>
                                                 </tr>
-                                            );
-                                        })
-                                    }
-                                </tbody>
-                            </table>
-                            <nav aria-label="...">
-                                <ul className="pagination">
-                                    {
-                                        pageNumberArr.map((pageNumber) => {
-                                            let classStyleName = pageNumber === currPage ? "page-item active" : "page-item";
-                                            return (
-                                                <li onClick={() => this.handlePageChange(pageNumber)} key={pageNumber} className={classStyleName} style={{ cursor: 'pointer' }}><span className='page-link'>{pageNumber}</span>
-                                                </li>
-                                            )
-                                        })
-                                    }
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </React.Fragment>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    filteredArr.map((movieObj) => {
+                                                        return (
+                                                            <tr scope="row" key={movieObj._id}>
+                                                                <td></td>
+                                                                <td>{movieObj.title}</td>
+                                                                <td>{movieObj.genre.name}</td>
+                                                                <td>{movieObj.numberInStock}</td>
+                                                                <td>{movieObj.dailyRentalRate}</td>
+                                                                <td><button onClick={function () { this.handleDelete(movieObj._id) }.bind(this)} type="button" className="btn btn-danger">Delete</button></td>
+                                                            </tr>
+                                                        );
+                                                    })
+                                                }
+                                            </tbody>
+                                        </table>
+                                        <nav aria-label="...">
+                                            <ul className="pagination">
+                                                {
+                                                    pageNumberArr.map((pageNumber) => {
+                                                        let classStyleName = pageNumber === currPage ? "page-item active" : "page-item";
+                                                        return (
+                                                            <li onClick={() => this.handlePageChange(pageNumber)} key={pageNumber} className={classStyleName} style={{ cursor: 'pointer' }}><span className='page-link'>{pageNumber}</span>
+                                                            </li>
+                                                        )
+                                                    })
+                                                }
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </React.Fragment >
+                }
+            </>
         );
     }
 }
