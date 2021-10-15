@@ -2,7 +2,7 @@ import React from 'react';
 
 const Home = () => {
     return ( 
-        <h1>This is Home Page Component</h1>
+        <h1 style={{textAlign:'center'}}>This is Home Page Component</h1>
      );
 }
  
