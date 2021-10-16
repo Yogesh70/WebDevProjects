@@ -7,11 +7,11 @@ function Uewc() {
     useEffect(() => {
         console.log('useEffect');
         document.title = `Clicked ${count} times`;
-        // cleanUp optional -> runs before next useEffect() Hook runs
+        // cleanUp optional -> runs before a component is unmounted
         return () => {
             alert(`I will be called before the next useEffect is called ${count}`);
         }
-    })
+    }, [])
     return (
         <div>
             <p>{count}</p>
