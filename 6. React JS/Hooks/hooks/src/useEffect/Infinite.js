@@ -8,7 +8,7 @@ function Infinite() {
         console.log('Use Effect');
         let num = Math.random() * 100;
         setCount(num);
-    })
+    }, [])
 
     return (
         <>
