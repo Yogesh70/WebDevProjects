@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 
 function Us() {
+
+    // In useState() Hook the state is initialized at 1st time render only
+    // After that the state is not reinitialized on reRendering
     const [msgObj, setMessage] = useState({ id: 1, message: '' });
 
     const handleChange = (e) => {
