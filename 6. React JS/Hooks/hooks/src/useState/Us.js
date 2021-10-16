@@ -7,9 +7,7 @@ function Us() {
         let val = e.target.value;
         // msgObj.message = val;
         // console.log(msgObj);
-        // setMessage({ ...msgObj, message: val }); // way 1
-
-        // way to set State of an Obj with multiple keys in useState() hook
+        // setMessage({ ...msgObj, message: val }); 
         let obj = { ...msgObj, message: val };
         setMessage(obj);
     }
