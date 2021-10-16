@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 function Us() {
-    const [msgObj, setMessage] = useState({ message: '' });
+    const [msgObj, setMessage] = useState({ id: 1, message: '' });
 
     const handleChange = (e) => {
         let val = e.target.value;
@@ -9,8 +9,8 @@ function Us() {
         // console.log(msgObj);
         // setMessage({ ...msgObj, message: val }); // way 1
 
-        // way 2 
-        let obj = { message: val };
+        // way to set State of an Obj with multiple keys in useState() hook
+        let obj = { ...msgObj, message: val };
         setMessage(obj);
     }
 
