@@ -3,6 +3,7 @@ import MyContext from './Context';
 import DemoChild from './DemoChild';
 
 function Demo() {
+    console.log('Demo Render');
     const val = useContext(MyContext);
     console.log(val);
 
