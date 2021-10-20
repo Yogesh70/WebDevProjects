@@ -4,8 +4,8 @@ import DemoChild from './DemoChild';
 
 function Demo() {
     console.log('Demo Render');
-    const val = useContext(MyContext);
-    console.log(val);
+    // const val = useContext(MyContext);
+    // console.log(val);
 
     return (
         <div>
@@ -14,4 +14,4 @@ function Demo() {
     );
 }
 
-export default Demo;
+export default React.memo(Demo);
